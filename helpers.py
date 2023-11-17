@@ -16,7 +16,21 @@ def pokelist(category):
 	return list({i[category] for i in poke_json})
 
 def pokemon(category, terms):
-	return [i for i in poke_json if terms in i[category]]
+	if "." in category:
+		category, key = category.split(".")
+	if not key:
+		return [i for i in poke_json if terms in i[category]]
+	output = []
+	for p in poke_json:
+		if isinstance(p[category], list):
+			for c in p[category]:
+				if terms in c[key]:
+					output.append(p)
+		if isinstance(p[category], dict):
+			print(p[category])
+			if terms in p[category][key]:
+				output.append(p)
+	return output
 
 def move(terms):
 	return [i for i in moves_json if terms in i["name"]]
@@ -37,10 +51,9 @@ def display(category, output, json_flag):
 		table.add_column("ID", justify="right")
 		table.add_column("Name")
 		table.add_column("Types")
-		table.add_column(category.title())
 		output.sort(key=lambda x : x["id"])
 		for d in output:
 			types = ",".join(d["types"]).title()
-			table.add_row(str(d["id"]), d["name"], types, str(d[category]))
+			table.add_row(str(d["id"]), d["name"], types)
 	console = Console()
 	console.print(table)
