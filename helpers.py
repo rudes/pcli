@@ -47,13 +47,29 @@ def display(category, output, json_flag):
 		for d in move_data:
 			table.add_row(d, str(move_data[d]))
 	else:
-		table = Table(title=f"{category.title()} search")
+		table = Table(title=f"{category.title()} Search")
 		table.add_column("ID", justify="right")
 		table.add_column("Name")
 		table.add_column("Types")
-		output.sort(key=lambda x : x["id"])
+		table.add_column("Base Stats")
+		output = list({p['id']:p for p in output}.values())
+		output.sort(reverse = True, key=lambda x : x["stats"]["speed"])
 		for d in output:
-			types = ",".join(d["types"]).title()
-			table.add_row(str(d["id"]), d["name"], types)
+			unique_types = list(set(d["types"]))
+			table.add_row(
+				str(d["id"]),
+				d["name"],
+				",".join(unique_types).title(),
+				_flatten_stats(d["stats"]),
+			)
 	console = Console()
 	console.print(table)
+
+def _flatten_stats(stats):
+	r = f"{stats['hp']:3} |"
+	r += f"{stats['attack']:4} |"
+	r += f"{stats['defense']:4} |"
+	r += f"{stats['sp_attack']:4} |"
+	r += f"{stats['sp_defense']:4} |"
+	r += f"{stats['speed']:4}"
+	return r
