@@ -16,6 +16,7 @@ def pokelist(category):
 	return list({i[category] for i in poke_json})
 
 def pokemon(category, terms):
+	key = None
 	if "." in category:
 		category, key = category.split(".")
 	if not key:
